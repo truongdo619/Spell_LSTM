@@ -1,4 +1,6 @@
 
+import time
+
 MAX_LEN=10
 
 def read_by_line(filepath):
@@ -33,4 +35,4 @@ def load():
     return sentences, next_words, word_indices, indices_word, vocab, MAX_LEN
 
 
-# load()
+# sentences, next_words, word_indices, indices_word, vocab, MAX_LEN = load()
