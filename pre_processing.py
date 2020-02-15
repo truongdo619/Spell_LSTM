@@ -13,7 +13,7 @@ f = open("data", "w")
 def clean_text(text):
     '''Remove unwanted characters and extra spaces from the text'''
 
-    text = re.sub(r'\.', ' ', text)
+    text = re.sub(r'\.', '', text)
     text = re.sub(r'\?', ' ', text)
     text = re.sub(r'&', ' ', text)
     text = re.sub(r'-', ' ', text)
@@ -83,7 +83,7 @@ def get_sentences_from_json(url):
         for item in jsons:
             tmp = [sens for sens in sent_tokenize(item['heading'])]
             for s in tmp:
-                if (len(s.split()) > 25 and '\x11��c' not in s):
+                if (len(s.split()) > 50 and '\x11��c' not in s):
                     f.write(clean_text(s) + "\n")
                     num += 1
     except:
@@ -93,7 +93,7 @@ def get_sentences_from_json(url):
 def main():
     files = get_gz_path()
     print(len(files))
-    for i in range(2):
+    for i in range(100):
         get_sentences_from_json(files[i])
     # multithread_helper(files, get_sentences_from_json)
     print("Number of lines: " + str(num))
