@@ -17,8 +17,8 @@ def read_by_line(filepath):
     lines=lines[:-1]
     return lines, vocab
 
-def load():
-    lines, vocab=read_by_line("data")
+def load(path):
+    lines, vocab=read_by_line(path)
     vocab=sorted(sorted(list(vocab)))
     vocab.append("")
     word_indices=dict((c,i+1) for i, c in enumerate(vocab))

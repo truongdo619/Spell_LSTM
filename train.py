@@ -2,36 +2,44 @@ import numpy as np
 from load_data import load
 from model import Spell_LSTM
 from keras.preprocessing.sequence import pad_sequences
+import os
+
+def get_data_path():
+    base_path = "/run/media/kodiak/New Volume/Spell_Check_folder/data_train"
+    files = []
+    for r, d, f in os.walk(base_path):
+        for file in f:
+            if 'data' in file:
+                files.append(os.path.join(r, file))
+    return files
+
 
 if __name__== "__main__":
 
-    print(1)
-    sentences, next_words, word_indices, indices_word, vocab, MAX_LEN = load()
+    main_vocab = set()
+    paths = get_data_path()
 
-    print(len(sentences))
-    print(2)
-    # X = np.zeros((len(sentences), MAX_LEN, len(vocab)), dtype=np.bool)
-    Y = np.zeros((len(sentences), len(vocab)), dtype=np.bool)
+    for path in paths:
+        print(path)
+        sentences, next_words, word_indices, indices_word, vocab, MAX_LEN = load(path)
+        main_vocab.update(vocab)
 
-    print(3)
-    encoded_docs = []
-    for sen in sentences:
-        encoded_sen = []
-        for word in sen:
-            encoded_sen.append(word_indices[word])
-        encoded_docs.append(encoded_sen)
+    print(len(main_vocab))
 
-    X = pad_sequences(encoded_docs, maxlen=MAX_LEN, padding='pre')
-
-    print(4)
-    for i, sen in enumerate(sentences):
-        # print(i)
-        # for k, word in enumerate(sen):
-        #     X[i, k, word_indices[word]] = 1
-        Y[i, word_indices[next_words[i]]] = 1
-
-
-    print(5)
+    # Y = np.zeros((len(sentences), len(vocab)), dtype=np.bool)
+    #
+    # encoded_docs = []
+    # for sen in sentences:
+    #     encoded_sen = []
+    #     for word in sen:
+    #         encoded_sen.append(word_indices[word])
+    #     encoded_docs.append(encoded_sen)
+    #
+    # X = pad_sequences(encoded_docs, maxlen=MAX_LEN, padding='pre')
+    #
+    # for i, sen in enumerate(sentences):
+    #     Y[i, word_indices[next_words[i]]] = 1
+    #
     # model = Spell_LSTM(MAX_LEN, len(vocab))
     #
     # print(model.summary())
