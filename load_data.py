@@ -1,38 +1,49 @@
-
+import gzip
 import time
+from helper.train_helper import get_vocab
+import json
 
-MAX_LEN=10
-
+vocab, word_indices, indices_word = get_vocab()
 def read_by_line(filepath):
-    vocab = set()
     lines=[]
-    with open(filepath) as fp:
+    with gzip.open(filepath, 'rt', encoding="utf8") as fp:
         line = fp.readline()
-        lines.append(line.lower().split())
-        vocab.update(line.lower().split())
+        lines.append(line.split())
         while line:
             line = fp.readline()
-            lines.append(line.lower().split())
-            vocab.update(line.lower().split())
+            lines.append(line.split())
     lines=lines[:-1]
-    return lines, vocab
+    return lines
 
-def load(path):
-    lines, vocab=read_by_line(path)
-    vocab=sorted(sorted(list(vocab)))
-    vocab.append("")
-    word_indices=dict((c,i+1) for i, c in enumerate(vocab))
-    indices_word=dict((i+1,c) for i, c in enumerate(vocab))
+def load_inputs(path, MAX_LEN):
+    global word_indices
+    lines = read_by_line(path)
     sentences=[]
-    next_words=[]
     for line in lines:
         for i in range(1, len(line)):
             if (i >= MAX_LEN):
                 sentences.append(line[i - MAX_LEN:i])
             else:
                 sentences.append(line[:i])
-            next_words.append(line[i])
-    return sentences, next_words, word_indices, indices_word, vocab, MAX_LEN
 
+    encoded_docs = []
+    num = 0
+    for sen in sentences:
+        num += 1
+        encoded_sen = []
+        for word in sen:
+            encoded_sen.append(word_indices[word])
+        encoded_docs.append(encoded_sen)
+    return encoded_docs
 
-# sentences, next_words, word_indices, indices_word, vocab, MAX_LEN = load()
+def load_next_words(path):
+    global word_indices
+    lines = read_by_line(path)
+    next_words = []
+    for line in lines:
+        for i in range(1, len(line)):
+            next_words.append(word_indices[line[i]])
+
+    return next_words
+
+# sentences, next_words = load("/run/media/kodiak/New Volume/Spell_Check_folder/data_train/data_8.gz")

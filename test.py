@@ -1,9 +1,12 @@
-from load_data import load
+import sys
+sys.path.insert(0, './')
+from load_data import word_indices, indices_word
+from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import string
 from keras.models import load_model
 
-maxlen = 20
+MAX_LEN = 10
 
 _letters = ['a', 'ă', 'â', 'b', 'c', 'd', 'đ', 'e', 'ê', 'g', 'h', 'i', 'k', 'l', 'm', 'n', 'o', 'ô', 'ơ', 'p', 'q',
             'r', 's', 't', 'j', 'w', 'f', 'u', 'ư', 'v', 'x', 'y', 'á', 'à', 'ả', 'ã', 'ạ', 'ấ', 'ầ', 'ẩ', 'ẫ', 'ậ',
@@ -11,40 +14,33 @@ _letters = ['a', 'ă', 'â', 'b', 'c', 'd', 'đ', 'e', 'ê', 'g', 'h', 'i', 'k',
             'ò', 'ỏ', 'õ', 'ọ', 'ố', 'ồ', 'ổ', 'ỗ', 'ộ', 'ớ', 'ờ', 'ở', 'ỡ', 'ợ', 'ú', 'ù', 'ủ', 'ũ', 'ụ', 'ứ', 'ừ',
             'ử', 'ữ', 'ự', 'ý', 'ỳ', 'ỷ', 'ỹ', 'ỵ']
 
-sentences, next_words, word_indices, indices_word, vocab, MAX_LEN = load()
-
-model = load_model('model.h5')
+model = load_model('best_model.hdf5')
 
 model.summary()
 
 
 def correct(sentence):
     words=sentence.split()
-    for i in range(1, len(words)):
-        if (i < 20):
+    for i in range(11, len(words)):
+        if (i < MAX_LEN):
             sen = words[:i]
         else:
-            sen = words[i-20:i]
+            sen = words[i-MAX_LEN:i]
         word_need_check= words[i]
-        if word_need_check in vocab:
-            x = np.zeros((1, maxlen, len(vocab)))
-            for j in range(maxlen - len(sen)):
-                x[0, j, word_indices[""]] = 1
-            for j, word in enumerate(sen):
-                x[0, maxlen - len(sen) + j, word_indices[word]] = 1
 
-            print(word_need_check)
-            preds = model.predict(x, verbose=0)[0]
-            m = max(preds)
-            index = [i for i, j in enumerate(preds) if j == m]
-            print(indices_word[index[0]])
-            # words[i] = indices_word[index[0]]
-            print("-------------------------")
+        print(word_need_check)
+        encoded_sen = []
 
-        # true_index=sample(preds, word_need_check)
-        # true_word = indices_word(true_index)
-        # words[index] = true_word
-        # print(word_need_check + " => " + true_word)
+        for word in sen:
+            encoded_sen.append(word_indices[word])
+        X = np.asarray(encoded_sen).reshape(1,10)
+        preds = model.predict(X, verbose=0)[0]
+        m = max(preds)
+        index = [i for i, j in enumerate(preds) if j == m]
+        print(indices_word[index[0]])
+        # words[i] = indices_word[index[0]]
+        print("-------------------------")
+
 
 def edit_distance_1(word):
     word = ENSURE_UNICODE(word).lower()
@@ -80,4 +76,4 @@ def ENSURE_UNICODE(s, encoding='utf-8'):
         return s.decode(encoding)
     return s
 
-correct("Tổng vốn đầu tư được lập ở mức rất cao trạm thu phí mọc lên dày đặc mức phí cào bằng ở các dự án BOT đường bộ việc lựa chọn nhà thầu có vấn đề là những vấn đề được chi ra trong các kết luận".lower())
+correct("giáo dục gia đình có những đặc trưng riêng nên nhà trường phải liên kết với gia đình để đảm bảo tính thống nhất toàn vẹn của".lower())

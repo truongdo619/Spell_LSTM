@@ -1,0 +1,10 @@
+{
+  "model": {
+    "MAX_LEN" : 10,
+    "batch_size" : 128
+  },
+  "train" : {
+    "workers" : 5,
+    "epochs" : 150
+  }
+}
